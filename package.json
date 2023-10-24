@@ -28,6 +28,12 @@
   "manifest": {
     "host_permissions": [
       "https://*/*"
+    ],
+    "permissions": [
+      "webRequest",
+      "<all_urls>",
+      "webRequestBlocking",
+      "tabs"
     ]
   }
 }
