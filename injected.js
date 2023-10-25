@@ -10,10 +10,9 @@ window.fetch = async (...args) => {
     .then((data) => {
       //все нужные данные содержатся в api вызове на detail и data/stores 
       if (url.includes("detail") || url.includes("data/stores")) {
-        const stringifiedData = JSON.stringify(data)
-        window.postMessage({ type: "fetch", url: url, data: stringifiedData }, "*")
+        window.postMessage({ type: "fetch", url: url, data: data }, "*")
       }
     })
-    .catch((err) => console.log(''))
+    .catch((err) => console.log(err))
   return response
 }

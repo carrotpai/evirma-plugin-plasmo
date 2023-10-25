@@ -2,7 +2,7 @@ import InjectedUrl from "url:~/injected.js";
 
 
 export const config = {
-  matches: ["https://www.wildberries.ru/catalog/*"],
+  matches: ["https://www.wildberries.ru/*"],
   all_frames: true,
   run_at: 'document_start'
 }

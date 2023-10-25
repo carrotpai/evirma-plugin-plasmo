@@ -1,6 +1,11 @@
+import logo64 from "data-base64:~assets/logo.jpeg"
 import cssText from "data-text:~style.css"
-import type { PlasmoCSConfig, PlasmoGetInlineAnchor } from "plasmo"
-import { Fragment, useEffect } from "react"
+import type {
+  PlasmoCSConfig,
+  PlasmoGetInlineAnchor,
+  PlasmoGetShadowHostId
+} from "plasmo"
+import { Fragment } from "react"
 
 import { bailOutInlineAnchor } from "~util"
 
@@ -8,14 +13,17 @@ import { useData } from "./dataStore"
 
 //где запускать скрипт (контент скрипт)
 export const config: PlasmoCSConfig = {
-  matches: ["https://www.wildberries.ru/catalog/*"],
+  matches: ["https://www.wildberries.ru/*"],
   all_frames: true,
   run_at: "document_idle"
 }
 
 const timer = bailOutInlineAnchor("Stock block not found")
-const selector =
-  "div.__evirma_inject_block > div.seller-info__content > div.seller-info__header"
+
+const sideBarSelector =
+  "div.product-page__aside-sticky > div.product-page__seller-wrap"
+
+let selector = sideBarSelector
 
 export const getInlineAnchor: PlasmoGetInlineAnchor = async () => {
   const elem = document.querySelector(selector)
@@ -29,20 +37,30 @@ export const getStyle = () => {
   return style
 }
 
+export const getShadowHostId: PlasmoGetShadowHostId = () => `STOCK-BLOCK`
 const PlasmoOverlay = () => {
-  const { data } = useData()
+  const data = useData()
   const nearestWareHouse = data?.stocks?.sort(
     (a, b) => a.time1 + a.time2 - (b.time1 + b.time2)
   )[0]
   return (
-    <div className="rounded-xl p-5 bg-white shadow-[0 0 20px rgba(0, 0, 0, 0.1)] max-w-[340px]">
-      <div className="text-gray-600 font-bold text-base">
-        Раскладка по складам
+    <div className="rounded-[20px] p-5 bg-white shadow-none max-w-full lg:shadow-base w-full lg:max-w-[340px] mb-4">
+      <div className="flex items-center gap-2">
+        <img
+          src={logo64}
+          width={36}
+          height={36}
+          alt="market papa logo"
+          className="w-9 h-9 hidden lg:block"
+        />
+        <p className="text-gray-600 font-bold text-base">
+          Раскладка по складам
+        </p>
       </div>
-      <div className="text-sm ml-6 my-2 font-bold">{`${nearestWareHouse?.wh_name}: ${
+      <div className="text-sm lg:ml-11 my-2 font-bold">{`${nearestWareHouse?.wh_name}: ${
         (nearestWareHouse?.time1 ?? 0) + (nearestWareHouse?.time2 ?? 0)
       } час.`}</div>
-      <div className="pt-2 border-t-gray-300 border-t grid-cols-2 grid gap-2 ml-6">
+      <div className="pt-2 border-t-gray-300 border-t grid-cols-2 grid gap-2 lg:ml-11">
         {data?.stocks?.map((wh) => (
           <Fragment key={wh.wh_name}>
             <span className="text-gray-600 text-sm">{wh.wh_name}</span>

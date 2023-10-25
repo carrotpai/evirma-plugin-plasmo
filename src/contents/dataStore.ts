@@ -10,7 +10,7 @@ import type {
 type Listener = (onStoreChange?: () => void) => void
 
 export const config = {
-  matches: ["https://www.wildberries.ru/catalog/*"],
+  matches: ["https://www.wildberries.ru/*"],
   all_frames: true,
   run_at: "document_start"
 }
@@ -43,6 +43,7 @@ function setProductData() {
     return minTimeA.time1 + minTimeA.time2 - minTimeB.time1 - minTimeB.time2
   })
   const currentProduct = productsList[0]
+  //если есть продукт и данные о складах создать полноценные данные
   if (productsList[0] && wareHousesData) {
     productData = {
       extended: productsList[0].extended,
@@ -51,7 +52,7 @@ function setProductData() {
         return { ...wh, wh_name: whName?.name }
       })
     }
-    console.log(productData)
+    //иначе только данные о СПП
   } else {
     if (productsList[0]) {
       productData = {
@@ -61,14 +62,18 @@ function setProductData() {
   }
 }
 
-const onDetailMessageCallback = async (e: MessageEvent) => {
+const onMessageCallback = async (e: MessageEvent) => {
   const respInfo = e.data as
-    | { type: string; url: string; data: string }
+    | {
+        type: string
+        url: string
+        data: DetailResponseType | WareHousesResponseType
+      }
     | undefined
   if (respInfo && respInfo.url) {
     //запрос на detail о продукте
     if (respInfo.url.includes("detail")) {
-      const incomDetailData = JSON.parse(respInfo.data) as DetailResponseType
+      const incomDetailData = respInfo.data as DetailResponseType
       //пройтись по всем продуктам в запросе и выбрать те которые есть на складе
       incomDetailData.data.products.forEach((product) => {
         if (product.sizes[0].stocks.length) {
@@ -80,13 +85,14 @@ const onDetailMessageCallback = async (e: MessageEvent) => {
 
     //запрос на все склады
     if (respInfo.url.includes("data/stores")) {
-      wareHousesData = JSON.parse(respInfo.data)
+      wareHousesData = respInfo.data as WareHousesResponseType
     }
-    //оповестить компоненты о изменении
-    emitChange()
   }
+  //оповестить компоненты о изменении
+  emitChange()
 }
 
+//следить за url -> если меняется, обнулить некоторые поля хранилища
 const observeUrlChange = () => {
   let oldHref = document.location.href
   const body = document.querySelector("body") as Node
@@ -101,15 +107,19 @@ const observeUrlChange = () => {
   observer.observe(body, { childList: true, subtree: true })
 }
 
-window.addEventListener("message", onDetailMessageCallback)
+window.addEventListener("message", onMessageCallback)
 window.onload = observeUrlChange
+window.onbeforeunload = function () {
+  productData = null
+  productsList = []
+}
 
 export function useData() {
   const data = useSyncExternalStore<ProductDataType | null>(
     subscribe,
     getSnapshot
   )
-  return { data }
+  return data
 }
 
 function subscribe(listener: Listener) {
