@@ -9,7 +9,7 @@ window.fetch = async (...args) => {
     .json()
     .then((data) => {
       //все нужные данные содержатся в api вызове на detail и data/stores 
-      if (url.includes("detail") || url.includes("data/stores")) {
+      if (url.includes("detail")) {
         window.postMessage({ type: "fetch", url: url, data: data }, "*")
       }
     })

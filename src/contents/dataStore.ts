@@ -80,12 +80,15 @@ const onMessageCallback = async (e: MessageEvent) => {
           productsList.push(product)
         }
       })
-      setProductData()
-    }
 
-    //запрос на все склады
-    if (respInfo.url.includes("data/stores")) {
-      wareHousesData = respInfo.data as WareHousesResponseType
+      if (!wareHousesData) {
+        wareHousesData = await (
+          await fetch(
+            "https://static-basket-01.wb.ru/vol0/data/stores-data.json"
+          )
+        ).json()
+      }
+      setProductData()
     }
   }
   //оповестить компоненты о изменении

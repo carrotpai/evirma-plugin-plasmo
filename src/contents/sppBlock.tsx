@@ -1,10 +1,7 @@
 import logo64 from "data-base64:~assets/logo.jpeg"
 import cssText from "data-text:~style.css"
-import type {
-  PlasmoCSConfig,
-  PlasmoGetInlineAnchor,
-  PlasmoGetShadowHostId
-} from "plasmo"
+import type { PlasmoCSConfig, PlasmoGetInlineAnchor } from "plasmo"
+import { useEffect } from "react"
 
 import { bailOutInlineAnchor } from "~util"
 
@@ -58,7 +55,9 @@ const PlasmoOverlay = () => {
       return undefined
     }
   }
-
+  useEffect(() => {
+    console.log("changed spp")
+  }, [data])
   return (
     <div className="flex items-center gap-2 w-full max-w-[300px] mb-2 xl:mb-0">
       <img

@@ -1,11 +1,7 @@
 import logo64 from "data-base64:~assets/logo.jpeg"
 import cssText from "data-text:~style.css"
-import type {
-  PlasmoCSConfig,
-  PlasmoGetInlineAnchor,
-  PlasmoGetShadowHostId
-} from "plasmo"
-import { Fragment } from "react"
+import type { PlasmoCSConfig, PlasmoGetInlineAnchor } from "plasmo"
+import { Fragment, useEffect } from "react"
 
 import { bailOutInlineAnchor } from "~util"
 
@@ -37,9 +33,12 @@ export const getStyle = () => {
   return style
 }
 
-export const getShadowHostId: PlasmoGetShadowHostId = () => `STOCK-BLOCK`
+/* export const getShadowHostId: PlasmoGetShadowHostId = () => `STOCK-BLOCK` */
 const PlasmoOverlay = () => {
   const data = useData()
+  useEffect(() => {
+    console.log("changed stock")
+  }, [data])
   const nearestWareHouse = data?.stocks?.sort(
     (a, b) => a.time1 + a.time2 - (b.time1 + b.time2)
   )[0]
